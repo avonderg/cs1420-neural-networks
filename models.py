@@ -10,7 +10,8 @@ def l2_loss(predictions,Y):
         :return: L2 loss using predictions for Y.
     '''
     # TODO
-    pass
+    l2 = np.sum(np.power((Y-predictions),2))
+    return l2
 
 def sigmoid(x):
     '''
@@ -27,7 +28,8 @@ def sigmoid_derivative(x):
         :return: Derivative of sigmoid evaluated at x (applied element-wise if it is an array)
     '''
     # TODO
-    pass
+    val = sigmoid(x)
+    return val * (1 - val)
 
 class OneLayerNN:
     '''
@@ -59,7 +61,7 @@ class OneLayerNN:
         :return: None
         '''
         # TODO: initialize weights
-
+        self.weights = np.zeros(len(X))
         # TODO: Train network for certain number of epochs
 
         # TODO: Shuffle the examples (X) and labels (Y)
@@ -69,9 +71,14 @@ class OneLayerNN:
 
         # TODO: Perform the forward and backward pass on the current batch
 
-        # Print the loss after every epoch
-        if print_loss:
-            print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
+
+        for epoch in range(self.epochs):
+            for x,y in zip(X, Y):
+                output = self.forward_pass(x)
+                changes_to_w = self.backward_pass(y, output)
+                # Print the loss after every epoch
+            if print_loss:
+                print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
 
     def forward_pass(self, X):
         '''
@@ -81,7 +88,19 @@ class OneLayerNN:
         :return: None
         '''
         # TODO:
-        pass
+        numExamples = X.shape[0]
+        #clean away previous examples
+        self.v = []
+
+        layerInput = self.weights[0].dot(np.vstack([X.T, np.ones([1, numExamples])]))
+
+        for index in range(self.epochs): #how to find num layers so i can loop through it??
+            if index ==0:
+                layerInput = self.weights[0].dot(np.vstack([X.T, np.ones([1, numExamples])]))
+            else:
+                layerInput = self.weights[index].dot(np.vstack([self.v[-1],np.ones([1,numExamples])]))
+        
+        self.v.append(layerInput)
 
     def backward_pass(self, X, Y):
         '''
@@ -93,6 +112,7 @@ class OneLayerNN:
         # TODO: Compute the gradients for the model's weights using backprop
 
         # TODO: Update the weights using gradient descent
+
         pass
 
     def backprop(self, X, Y):
@@ -104,6 +124,8 @@ class OneLayerNN:
         '''
         # TODO: Compute the average weights gradient
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
+
+
         pass
 
     def gradient_descent(self, grad_W):
@@ -247,6 +269,7 @@ class TwoLayerNN:
         # iterate through the examples in batch size increments
 
         # TODO: Perform the forward and backward pass on the current batch
+
 
         # Print the loss after every epoch
         if print_loss:
