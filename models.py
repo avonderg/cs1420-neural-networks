@@ -61,16 +61,8 @@ class OneLayerNN:
         :return: None
         '''
         # TODO: initialize weights
-        self.weights = np.zeros(len(X))
-        # TODO: Train network for certain number of epochs
-
-        # TODO: Shuffle the examples (X) and labels (Y)
-
-        # TODO: We need to iterate over each data point for each epoch
-        # iterate through the examples in batch size increments
-
-        # TODO: Perform the forward and backward pass on the current batch
-
+        self.weights = np.random.uniform
+        # figure out shape for weights
 
         for epoch in range(self.epochs):
             for x,y in zip(X, Y):
@@ -80,6 +72,31 @@ class OneLayerNN:
             if print_loss:
                 print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
 
+        # HW3 logistic regression modified - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -  -
+        # converge = False
+        # losses = []
+        # while (not converge):
+        #     epoch+=1
+        #     # shuffle examples AND labels -> so the labels are the same (both the same way)
+        #     shuffler = np.random.permutation(len(X))
+        #     X_shuffled = X[shuffler]
+        #     Y_shuffled = Y[shuffler]
+        #     for epoch in range(self.epochs):
+        #         xBatch = X_shuffled[i: i + self.batch_size]
+        #         yBatch = Y_shuffled[i: i + self.batch_size]
+        #         L = np.zeros_like(self.weights)
+        #         for x,y in zip(xBatch, yBatch):
+        #             for j in range(0, self.n_classes):  
+        #                 if (y == j):
+        #                     L[j] += (softmax(np.matmul(self.weights,x))[j] - 1) * x
+        #                 else:
+        #                     L[j] += (softmax(np.matmul(self.weights,x))[j]) * x
+        #         self.weights -= self.alpha * L / len(xBatch)
+        #     losses.append(self.loss(X_shuffled, Y_shuffled))
+        #     if (len(losses)>1 and abs(losses[-1]-losses[-2]) <= self.conv_threshold):
+        #         converge = True
+        # return epoch
+
     def forward_pass(self, X):
         '''
         Computes the predictions for a single layer given examples X and
@@ -88,19 +105,8 @@ class OneLayerNN:
         :return: None
         '''
         # TODO:
-        numExamples = X.shape[0]
-        #clean away previous examples
-        self.v = []
-
-        layerInput = self.weights[0].dot(np.vstack([X.T, np.ones([1, numExamples])]))
-
-        for index in range(self.epochs): #how to find num layers so i can loop through it??
-            if index ==0:
-                layerInput = self.weights[0].dot(np.vstack([X.T, np.ones([1, numExamples])]))
-            else:
-                layerInput = self.weights[index].dot(np.vstack([self.v[-1],np.ones([1,numExamples])]))
+        self.v = np.matmul(X, self.weights)
         
-        self.v.append(layerInput)
 
     def backward_pass(self, X, Y):
         '''
@@ -113,6 +119,7 @@ class OneLayerNN:
 
         # TODO: Update the weights using gradient descent
 
+        # call backprop and do gradient descent on resulting gradients
         pass
 
     def backprop(self, X, Y):
@@ -124,7 +131,7 @@ class OneLayerNN:
         '''
         # TODO: Compute the average weights gradient
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
-
+         #gradient - > calculate, then gradient descent
 
         pass
 
@@ -136,6 +143,28 @@ class OneLayerNN:
         '''
         # TODO: Update the weights using the given gradient and the learning rate
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
+        converge = False
+        losses = []
+        while (not converge):
+            epoch+=1
+            # shuffle examples AND labels -> so the labels are the same (both the same way)
+            shuffler = np.random.permutation(len(grad_W))
+            W_shuffled = grad_W[shuffler]
+            for epoch in range(np.ciel(len(grad_W)/b) -1): #do i calculate the cieling?
+                xBatch = X_shuffled[i: i + self.batch_size]
+                yBatch = Y_shuffled[i: i + self.batch_size]
+                L = np.zeros_like(self.weights)
+                for x,y in zip(xBatch, yBatch):
+                    for j in range(0, self.n_classes):  
+                        if (y == j):
+                            L[j] += (softmax(np.matmul(self.weights,x))[j] - 1) * x
+                        else:
+                            L[j] += (softmax(np.matmul(self.weights,x))[j]) * x
+                self.weights -= self.alpha * L / len(xBatch)
+            losses.append(self.loss(X_shuffled, Y_shuffled))
+            if (len(losses)>1 and abs(losses[-1]-losses[-2]) <= self.conv_threshold):
+                converge = True
+        return epoch
         pass
 
     def loss(self, X, Y):
@@ -174,9 +203,10 @@ class TwoLayerNN:
             bh: The first (hidden) layer bias of the neural network model.
             wout: The second (output) layer weights of the neural network model.
             bout: The second (output) layer bias of the neural network model.
-            v1: The output of the first layer computed during the forward pass
-            a1: The activated output of the first layer computed during the forward pass
-            v2: The resulting predictions computed during the forward pass
+            a1: The output of the first layer computed during the forward pass
+            v1: The activated output of the first layer computed during the forward pass
+            a2: The output of the second layer computed during the forward pass
+            v2: The resulting predictions computed during the forward pass (layer 2 has the identity activation function)
             output_neurons: The number of outputs of the network
         '''
         self.activation = activation
@@ -193,8 +223,10 @@ class TwoLayerNN:
 
         # initialize the following values in the forward_pass() method
         # these values will be stored and used for the backward_pass()
-        self.v1 = None
+        # note that you may not need to use them all in backward_pass()
         self.a1 = None
+        self.v1 = None
+        self.a2 = None
         self.v2 = None
 
 
