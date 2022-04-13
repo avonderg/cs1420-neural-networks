@@ -61,41 +61,16 @@ class OneLayerNN:
         :return: None
         '''
         # TODO: initialize weights
-        self.weights = np.random.uniform
-        # figure out shape for weights
+        self.weights = np.zeros(len(X[0]))
+        # TODO: figure out shape for weights ^^
 
         for epoch in range(self.epochs):
             for x,y in zip(X, Y):
-                output = self.forward_pass(x)
-                changes_to_w = self.backward_pass(y, output)
+                self.forward_pass(x)
+                self.backward_pass(x, y)
                 # Print the loss after every epoch
             if print_loss:
                 print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
-
-        # HW3 logistic regression modified - - - - - - -  - - - - - - - - - - - - - - - - - - - - - - - - - -  -
-        # converge = False
-        # losses = []
-        # while (not converge):
-        #     epoch+=1
-        #     # shuffle examples AND labels -> so the labels are the same (both the same way)
-        #     shuffler = np.random.permutation(len(X))
-        #     X_shuffled = X[shuffler]
-        #     Y_shuffled = Y[shuffler]
-        #     for epoch in range(self.epochs):
-        #         xBatch = X_shuffled[i: i + self.batch_size]
-        #         yBatch = Y_shuffled[i: i + self.batch_size]
-        #         L = np.zeros_like(self.weights)
-        #         for x,y in zip(xBatch, yBatch):
-        #             for j in range(0, self.n_classes):  
-        #                 if (y == j):
-        #                     L[j] += (softmax(np.matmul(self.weights,x))[j] - 1) * x
-        #                 else:
-        #                     L[j] += (softmax(np.matmul(self.weights,x))[j]) * x
-        #         self.weights -= self.alpha * L / len(xBatch)
-        #     losses.append(self.loss(X_shuffled, Y_shuffled))
-        #     if (len(losses)>1 and abs(losses[-1]-losses[-2]) <= self.conv_threshold):
-        #         converge = True
-        # return epoch
 
     def forward_pass(self, X):
         '''
@@ -116,11 +91,10 @@ class OneLayerNN:
         :return: None
         '''
         # TODO: Compute the gradients for the model's weights using backprop
-
+        gradients = self.backprop(X,Y)
         # TODO: Update the weights using gradient descent
-
-        # call backprop and do gradient descent on resulting gradients
-        pass
+        self.gradient_descent(gradients)
+        
 
     def backprop(self, X, Y):
         '''
@@ -132,8 +106,14 @@ class OneLayerNN:
         # TODO: Compute the average weights gradient
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
          #gradient - > calculate, then gradient descent
+        #find what gradient is, use it to update weivghts in gradient descent
+        
+        # difference between v and true labels
+        res = 2*(self.v - Y)*X
+        # find avg
+        avg = res / len(X)
+        return avg
 
-        pass
 
     def gradient_descent(self, grad_W):
         '''
@@ -143,29 +123,29 @@ class OneLayerNN:
         '''
         # TODO: Update the weights using the given gradient and the learning rate
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
-        converge = False
-        losses = []
-        while (not converge):
-            epoch+=1
-            # shuffle examples AND labels -> so the labels are the same (both the same way)
-            shuffler = np.random.permutation(len(grad_W))
-            W_shuffled = grad_W[shuffler]
-            for epoch in range(np.ciel(len(grad_W)/b) -1): #do i calculate the cieling?
-                xBatch = X_shuffled[i: i + self.batch_size]
-                yBatch = Y_shuffled[i: i + self.batch_size]
-                L = np.zeros_like(self.weights)
-                for x,y in zip(xBatch, yBatch):
-                    for j in range(0, self.n_classes):  
-                        if (y == j):
-                            L[j] += (softmax(np.matmul(self.weights,x))[j] - 1) * x
-                        else:
-                            L[j] += (softmax(np.matmul(self.weights,x))[j]) * x
-                self.weights -= self.alpha * L / len(xBatch)
-            losses.append(self.loss(X_shuffled, Y_shuffled))
-            if (len(losses)>1 and abs(losses[-1]-losses[-2]) <= self.conv_threshold):
-                converge = True
-        return epoch
-        pass
+        # converge = False
+        # losses = []
+        # while (not converge):
+        #     epoch+=1
+        #     # shuffle examples AND labels -> so the labels are the same (both the same way)
+        #     shuffler = np.random.permutation(len(grad_W))
+        #     W_shuffled = grad_W[shuffler]
+        #     for epoch in range(np.ciel(len(grad_W)/b) -1): #do i calculate the cieling?
+        #         xBatch = X_shuffled[i: i + self.batch_size]
+        #         yBatch = Y_shuffled[i: i + self.batch_size]
+        #         L = np.zeros_like(self.weights)
+        #         for x,y in zip(xBatch, yBatch):
+        #             for j in range(0, self.n_classes):  
+        #                 if (y == j):
+        #                     L[j] += (softmax(np.matmul(self.weights,x))[j] - 1) * x
+        #                 else:
+        #                     L[j] += (softmax(np.matmul(self.weights,x))[j]) * x
+        #         self.weights -= self.alpha * L / len(xBatch)
+        #     losses.append(self.loss(X_shuffled, Y_shuffled))
+        #     if (len(losses)>1 and abs(losses[-1]-losses[-2]) <= self.conv_threshold):
+        #         converge = True
+        self.weights = self.weights - (self.learning_rate * grad_W) #scaling gradient vector
+        
 
     def loss(self, X, Y):
         '''
@@ -241,7 +221,7 @@ class TwoLayerNN:
         :return: the partial derivates dL/dbout, a numpy array of dimension: output_neurons by 1
         '''
         # TODO:
-        pass
+        return 2*(self.v2 - y)
 
     def _get_layer2_weights_gradient(self, x, y):
         '''
@@ -251,7 +231,7 @@ class TwoLayerNN:
         :return: the partial derivates dL/dwout, a numpy array of dimension: output_neurons by hidden_size
         '''
         # TODO:
-        pass
+        return 2*(self.v2 - y)*self.a1.T
 
     def _get_layer1_bias_gradient(self, x, y):
         '''
@@ -261,7 +241,9 @@ class TwoLayerNN:
         :return: the partial derivates dL/dbh, a numpy array of dimension: hidden_size by 1
         '''
         # TODO:
-        pass
+        # redo?
+        return (2*(self.v2 - y))*self.wout.T*(self.activation_derivative(self.v1))
+       
 
     def _get_layer1_weights_gradient(self, x, y):
         '''
@@ -271,7 +253,12 @@ class TwoLayerNN:
         :return: the partial derivates dL/dwh, a numpy array of dimension: hidden_size by input_size
         '''
         # TODO:
-        pass
+        #redo?
+        print("debugging")
+        print(self.activation_derivative(self.v1).shape)
+        print(x.T.shape)
+        # return (2*(self.v2 - y))*(self.activation_derivative(self.v1)@x.T)*self.wout
+        return (2*(self.v2 - y))*self.wout.T*(np.matmul(self.activation_derivative(self.v1),x.T))
 
     def train(self, X, Y, print_loss=True):
         '''
@@ -292,6 +279,14 @@ class TwoLayerNN:
         # HINT: for best performance initialize weights with np.random.normal or np.random.uniform
 
         # TODO: Weight and bias initialization
+        self.wh = np.random.uniform(size=(self.hidden_size,len(X[0])))
+        # self.wh.shape = (self.hidden_size,len(X))
+        self.bh = np.zeros((self.hidden_size,1))
+        # self.bh.shape = (self.hidden_size,1)
+        self.wout = np.random.uniform(size=(self.output_neurons,self.hidden_size))
+        # self.wout.shape = (self.output_neurons,self.hidden_size)
+        self.bout = np.zeros((self.output_neurons,1))
+        # self.bout.shape = (self.output_neurons,1)
 
         # TODO: Train network for certain number of epochs
 
@@ -302,10 +297,19 @@ class TwoLayerNN:
 
         # TODO: Perform the forward and backward pass on the current batch
 
-
-        # Print the loss after every epoch
-        if print_loss:
-            print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
+        for epoch in range(self.epochs):
+            # shuffle?
+            index = np.arange(len(X))
+            np.random.shuffle(index)
+            x = X[index]
+            y = Y[index]
+            for x_new,y_new in zip(x, y):
+                x_new = x_new.reshape((1,-1))
+                self.forward_pass(x_new.T)
+                self.backward_pass(x_new.T, y_new.T)
+                # Print the loss after every epoch
+            if print_loss:
+                print('Epoch: {} | Loss: {}'.format(epoch, self.loss(X, Y)))
 
 
     def forward_pass(self, X):
@@ -318,7 +322,17 @@ class TwoLayerNN:
         :return: None
         '''
         # TODO:
-        pass
+        # pass data through neural network
+        # First layer pre-activation
+    
+        self.v1 = np.matmul(self.wh,X) + self.bh
+
+        # First layer activation
+        self.a1 = self.activation(self.v1)
+
+        # Second layer pre-activation
+        # self.v2 = self.a1.dot(self.wout) + self.bout
+        self.v2 = np.matmul(self.wout,self.a1) + self.bout
 
     def backward_pass(self, X, Y):
         '''
@@ -328,9 +342,9 @@ class TwoLayerNN:
         :return: None
         '''
         # TODO: Compute the gradients for the model's weights using backprop
-
+        wh_gradient, bh_gradient, wout_gradient, bout_gradient = self.backprop(X,Y)
         # TODO: Update the weights using gradient descent
-        pass
+        self.gradient_descent(wh_gradient,bh_gradient,wout_gradient,bout_gradient)
 
     def backprop(self, X, Y):
         '''
@@ -340,7 +354,8 @@ class TwoLayerNN:
         :return: 4 Numpy arrays representing the computed gradients for each weight and bias
         '''
         # TODO: Call the "get gradient" methods
-        pass
+        return self._get_layer1_bias_gradient(X,Y), self._get_layer1_weights_gradient(X,Y), self._get_layer2_bias_gradient(X,Y), self._get_layer2_weights_gradient(X,Y)
+        
 
     def gradient_descent(self, grad_wh, grad_bh, grad_wout, grad_bout):
         '''
@@ -354,6 +369,16 @@ class TwoLayerNN:
         # TODO: Update the weights using the given gradients and the learning rate
         # Refer to the SGD algorithm in slide 5 in Lecture 19: Backpropagation
 
+        # OLD VERSION
+        # self.weights = self.weights - (self.learning_rate * grad_wh * grad_wout * grad_bh * grad_bout) #scaling gradient vector
+        
+        # updated version ?
+        self.wh = self.wh - (self.learning_rate * grad_wh)
+        self.bh = self.bh - (self.learning_rate * grad_bh)
+        self.wout = self.wout - (self.learning_rate * grad_wout)
+        self.bout = self.bout - (self.learning_rate * grad_bout)
+
+
     def loss(self, X, Y):
         '''
         Returns the total squared error on some dataset (X, Y).
@@ -362,7 +387,7 @@ class TwoLayerNN:
         :return: A float which is the squared error of the model on the dataset
         '''
         # Perform the forward pass and compute the l2 loss
-        self.forward_pass(X)
+        self.forward_pass(X.T)
         return l2_loss(self.v2, Y)
 
     def average_loss(self, X, Y):
