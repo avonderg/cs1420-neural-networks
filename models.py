@@ -325,7 +325,7 @@ class TwoLayerNN:
         # pass data through neural network
         # First layer pre-activation
     
-        self.v1 = np.matmul(self.wh,X) + self.bh
+        self.v1 = np.matmul(self.wh,X.T) + self.bh
 
         # First layer activation
         self.a1 = self.activation(self.v1)
