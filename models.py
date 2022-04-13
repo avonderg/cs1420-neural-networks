@@ -354,7 +354,11 @@ class TwoLayerNN:
         :return: 4 Numpy arrays representing the computed gradients for each weight and bias
         '''
         # TODO: Call the "get gradient" methods
-        return self._get_layer1_bias_gradient(X,Y), self._get_layer1_weights_gradient(X,Y), self._get_layer2_bias_gradient(X,Y), self._get_layer2_weights_gradient(X,Y)
+        # self._get_layer1_bias_gradient(X,Y)
+        # self._get_layer1_weights_gradient(X,Y)
+        # self._get_layer2_bias_gradient(X,Y)
+        # self._get_layer2_weights_gradient(X,Y)
+        return self._get_layer1_weights_gradient, self._get_layer1_bias_gradient, self._get_layer2_weights_gradient, self._get_layer2_bias_gradient
         
 
     def gradient_descent(self, grad_wh, grad_bh, grad_wout, grad_bout):
