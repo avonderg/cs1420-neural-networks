@@ -253,10 +253,7 @@ class TwoLayerNN:
         :return: the partial derivates dL/dwh, a numpy array of dimension: hidden_size by input_size
         '''
         # TODO:
-        #redo?
-        print("debugging")
-        print(self.activation_derivative(self.v1).shape)
-        print(x.T.shape)
+
         # return (2*(self.v2 - y))*(self.activation_derivative(self.v1)@x.T)*self.wout
         return (2*(self.v2 - y))*self.wout.T*(np.matmul(self.activation_derivative(self.v1),x.T))
 
@@ -358,7 +355,7 @@ class TwoLayerNN:
         # self._get_layer1_weights_gradient(X,Y)
         # self._get_layer2_bias_gradient(X,Y)
         # self._get_layer2_weights_gradient(X,Y)
-        return self._get_layer1_weights_gradient, self._get_layer1_bias_gradient, self._get_layer2_weights_gradient, self._get_layer2_bias_gradient
+        return self._get_layer1_weights_gradient(X,Y), self._get_layer1_bias_gradient(X,Y), self._get_layer2_weights_gradient(X,Y), self._get_layer2_bias_gradient(X,Y)
         
 
     def gradient_descent(self, grad_wh, grad_bh, grad_wout, grad_bout):
